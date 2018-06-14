@@ -20,32 +20,30 @@
     
     self.finished = NO;
     
-    // timer不加入Runloop 不能运行
-    NSTimer *timer = [NSTimer timerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
-        if (self.finished) {
-            [NSThread exit];
-        }
-        [NSThread sleepForTimeInterval:1]; // 耗时操作,在主线程会卡顿
-        NSLog(@"调用了定时器--%@",[NSThread currentThread]);
-    }];
-    
-    
     NSThread *thread = [[SVThread alloc]initWithBlock:^{ // 创建子线程
-        [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes]; // 在Runloop中添加timer监听事件
         
-        [[NSRunLoop currentRunLoop] run]; // 开启运行循环否则不会执行 在子线程开启运行循环,后台开启常驻线程
+        while (!self.finished) {
+            // 必须启动runloop
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0]]; // 直接[[NSRunLoop currentRunLoop] run]就不好退出了
+            
+        }
         
-//        while (true) { // 利用死循环, 子线程的任务一直没执行完毕,线程不会销毁,thread就不会被销毁,线程的生命只跟任务有关系
-//
-//        }
     }];
     [thread start];
+    // 线程间通信 如果线程死了,是不会调用doSomething的
+    [self performSelector:@selector(doSomething) onThread:thread withObject:nil waitUntilDone:NO];
+    
 }
+
+
+- (void)doSomething {
+    NSLog(@"线程间通信,dosomething-%@",[NSThread currentThread]);
+}
+
 
 // 如何退出后台线程 exit
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-//    self.finished = YES;
-    [NSThread exit];
+    self.finished = YES;
 }
 
 
@@ -60,5 +58,16 @@
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes]; //  commonMode 是上面两个mode的和,这一行代码等效上面两行
 }
 
+
+- (void)demo2 {
+    // timer不加入Runloop 不能运行
+    NSTimer *timer = [NSTimer timerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+        if (self.finished) {
+            [NSThread exit];
+        }
+        [NSThread sleepForTimeInterval:1]; // 耗时操作,在主线程会卡顿
+        NSLog(@"调用了定时器--%@",[NSThread currentThread]);
+    }];
+}
 
 @end

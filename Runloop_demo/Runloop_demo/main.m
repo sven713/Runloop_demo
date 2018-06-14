@@ -11,7 +11,7 @@
 
 int main(int argc, char * argv[]) {
     @autoreleasepool {
-        NSLog(@"来了");
+//        NSLog(@"来了");
         // 主线程的Runloop开启了,这个死循环在执行,就不会打印后面的coming
         int a = UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
         NSLog(@"coming?");
