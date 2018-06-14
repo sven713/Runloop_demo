@@ -19,7 +19,7 @@
     [super viewDidLoad];
     
     self.finished = NO;
-    
+    // 线程的生命是有CPU调度控制的,如果CPU没有调度,线程就死了.所以线程必须有执行不完的任务,线程才不会死掉,即常驻线程:开启这个线程的Runloop
     NSThread *thread = [[SVThread alloc]initWithBlock:^{ // 创建子线程
         
         [[NSRunLoop currentRunLoop] run]; // 这样就是常驻线程 子线程,开启Runloop
