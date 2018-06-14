@@ -22,12 +22,12 @@
     
     NSThread *thread = [[SVThread alloc]initWithBlock:^{ // 创建子线程
         
+        [[NSRunLoop currentRunLoop] run]; // 这样就是常驻线程 子线程,开启Runloop
+        
         while (!self.finished) {
             // 必须启动runloop
             [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0]]; // 直接[[NSRunLoop currentRunLoop] run]就不好退出了
-            
         }
-        
     }];
     [thread start];
     // 线程间通信 如果线程死了,是不会调用doSomething的
